@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/kost_model.dart';
 import '../models/room_model.dart';
 import '../widgets/room_card.dart';
+import '../widgets/add_room_dialog.dart';
 
 class KostDetailScreen extends StatefulWidget {
   final Kost kost;
@@ -186,7 +187,40 @@ class _KostDetailScreenState extends State<KostDetailScreen> {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: RoomCard(room: filteredRooms[index]),
+                    child: RoomCard(
+                      room: filteredRooms[index],
+                      kostName: widget.kost.name,
+                      onEdit: (updatedData) {
+                        setState(() {
+                          final roomIndex = rooms.indexOf(filteredRooms[index]);
+                          if (roomIndex != -1) {
+                            rooms[roomIndex] = Room(
+                              name: updatedData['name'],
+                              price: updatedData['price'],
+                              isOccupied: updatedData['isOccupied'],
+                              tenant: updatedData['tenant'],
+                            );
+                          }
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Room updated successfully'),
+                            backgroundColor: Color(0xFF6B9080),
+                          ),
+                        );
+                      },
+                      onDelete: () {
+                        setState(() {
+                          rooms.remove(filteredRooms[index]);
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Room deleted'),
+                            backgroundColor: Color(0xFFE53E3E),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               ),
@@ -195,8 +229,33 @@ class _KostDetailScreenState extends State<KostDetailScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Add new room
+        onPressed: () async {
+          final result = await showDialog(
+            context: context,
+            builder: (context) => const AddRoomDialog(),
+          );
+
+          if (result != null) {
+            setState(() {
+              rooms.add(
+                Room(
+                  name: result['name'],
+                  price: result['price'],
+                  isOccupied: result['isOccupied'],
+                  tenant: result['isOccupied'] ? 'New Tenant' : null,
+                ),
+              );
+            });
+
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Room added successfully'),
+                  backgroundColor: Color(0xFF6B9080),
+                ),
+              );
+            }
+          }
         },
         backgroundColor: const Color(0xFFE8A87C),
         child: const Icon(
