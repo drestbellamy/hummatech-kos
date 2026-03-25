@@ -12,8 +12,15 @@ class PenghuniScreen extends StatefulWidget {
 }
 
 class _PenghuniScreenState extends State<PenghuniScreen> {
+  final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedFilter = 'Semua Kost';
+  
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
   
   final List<Tenant> _tenants = [
     Tenant(
@@ -79,9 +86,16 @@ class _PenghuniScreenState extends State<PenghuniScreen> {
   }
 
   List<Tenant> get _filteredTenants {
+    // If search is empty and filter is "Semua Kost", return all tenants
+    if (_searchQuery.isEmpty && _selectedFilter == 'Semua Kost') {
+      return _tenants;
+    }
+    
     return _tenants.where((tenant) {
-      final matchesSearch = tenant.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+      final matchesSearch = _searchQuery.isEmpty ||
+          tenant.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           tenant.phone.contains(_searchQuery) ||
+          tenant.roomNumber.contains(_searchQuery) ||
           tenant.kostName.toLowerCase().contains(_searchQuery.toLowerCase());
       
       final matchesFilter = _selectedFilter == 'Semua Kost' || tenant.kostName == _selectedFilter;
@@ -219,6 +233,7 @@ class _PenghuniScreenState extends State<PenghuniScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextField(
+                          controller: _searchController,
                           onChanged: (value) {
                             setState(() {
                               _searchQuery = value;
@@ -228,6 +243,17 @@ class _PenghuniScreenState extends State<PenghuniScreen> {
                             hintText: 'Cari penghuni...',
                             hintStyle: const TextStyle(color: Color(0xFF718096)),
                             prefixIcon: const Icon(Icons.search, color: Color(0xFF718096)),
+                            suffixIcon: _searchQuery.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear, color: Color(0xFF718096)),
+                                    onPressed: () {
+                                      setState(() {
+                                        _searchController.clear();
+                                        _searchQuery = '';
+                                      });
+                                    },
+                                  )
+                                : null,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -313,23 +339,41 @@ class _PenghuniScreenState extends State<PenghuniScreen> {
           // Tenant List
           Expanded(
             child: _filteredTenants.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.people_outline,
                           size: 64,
                           color: Color(0xFFCBD5E0),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
-                          'Tidak ada penghuni',
-                          style: TextStyle(
+                          _searchQuery.isNotEmpty
+                              ? 'Tidak ada penghuni yang cocok\ndengan pencarian "$_searchQuery"'
+                              : 'Tidak ada penghuni\ndi ${_selectedFilter}',
+                          style: const TextStyle(
                             fontSize: 16,
                             color: Color(0xFF718096),
                           ),
+                          textAlign: TextAlign.center,
                         ),
+                        const SizedBox(height: 16),
+                        if (_searchQuery.isNotEmpty || _selectedFilter != 'Semua Kost')
+                          TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _searchQuery = '';
+                                _selectedFilter = 'Semua Kost';
+                              });
+                            },
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Reset Filter'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF6B9080),
+                            ),
+                          ),
                       ],
                     ),
                   )
