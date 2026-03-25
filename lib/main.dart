@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'screens/landing_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
 
 void main() {
@@ -20,7 +22,12 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LandingScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/main': (context) => const MainScreen(),
+      },
     );
   }
 }
