@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/tenant_model.dart';
 import '../widgets/tenant_card.dart';
 import '../widgets/tenant_detail_dialog.dart';
@@ -132,207 +133,221 @@ class _PenghuniScreenState extends State<PenghuniScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Set status bar to light content (white icons)
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+    );
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF6B9080), Color(0xFF5A7A6A)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
-                ),
+      body: Column(
+        children: [
+          // Header
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6B9080), Color(0xFF5A7A6A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Kelola Penghuni',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Kelola data penghuni kost',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            '${_tenants.length} Penghuni',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Search Bar
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            _searchQuery = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Cari penghuni...',
-                          hintStyle: const TextStyle(color: Color(0xFF718096)),
-                          prefixIcon: const Icon(Icons.search, color: Color(0xFF718096)),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
               ),
             ),
-
-            // Filter Tabs
-            Container(
-              height: 60,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _filterOptions.length,
-                itemBuilder: (context, index) {
-                  final option = _filterOptions[index];
-                  final isSelected = _selectedFilter == option;
-                  final count = _getKostCount(option);
-                  
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Row(
-                        mainAxisSize: MainAxisSize.min,
+            child: Column(
+              children: [
+                // Status bar space
+                SizedBox(height: MediaQuery.of(context).padding.top),
+                // Content
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Text(
-                            option,
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : const Color(0xFF4A5568),
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                            ),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Kelola Penghuni',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Kelola data penghuni kost',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 6),
+                          const Spacer(),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: isSelected 
-                                  ? Colors.white.withOpacity(0.3)
-                                  : const Color(0xFFE2E8F0),
-                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              count.toString(),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isSelected ? Colors.white : const Color(0xFF4A5568),
+                              '${_tenants.length} Penghuni',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedFilter = option;
-                        });
-                      },
-                      backgroundColor: Colors.white,
-                      selectedColor: const Color(0xFF6B9080),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: isSelected ? const Color(0xFF6B9080) : const Color(0xFFE2E8F0),
+                      const SizedBox(height: 16),
+                      
+                      // Search Bar
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              _searchQuery = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Cari penghuni...',
+                            hintStyle: const TextStyle(color: Color(0xFF718096)),
+                            prefixIcon: const Icon(Icons.search, color: Color(0xFF718096)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
                         ),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                  );
-                },
-              ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          ),
 
-            // Tenant List
-            Expanded(
-              child: _filteredTenants.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.people_outline,
-                            size: 64,
-                            color: Color(0xFFCBD5E0),
+          // Filter Tabs
+          Container(
+            height: 60,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _filterOptions.length,
+              itemBuilder: (context, index) {
+                final option = _filterOptions[index];
+                final isSelected = _selectedFilter == option;
+                final count = _getKostCount(option);
+                
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          option,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : const Color(0xFF4A5568),
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                           ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Tidak ada penghuni',
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isSelected 
+                                ? Colors.white.withValues(alpha: 0.3)
+                                : const Color(0xFFE2E8F0),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            count.toString(),
                             style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF718096),
+                              fontSize: 12,
+                              color: isSelected ? Colors.white : const Color(0xFF4A5568),
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _filteredTenants.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: TenantCard(
-                            tenant: _filteredTenants[index],
-                            onTap: () => _showTenantDetail(_filteredTenants[index]),
-                          ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedFilter = option;
+                      });
+                    },
+                    backgroundColor: Colors.white,
+                    selectedColor: const Color(0xFF6B9080),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: isSelected ? const Color(0xFF6B9080) : const Color(0xFFE2E8F0),
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+
+          // Tenant List
+          Expanded(
+            child: _filteredTenants.isEmpty
+                ? const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.people_outline,
+                          size: 64,
+                          color: Color(0xFFCBD5E0),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Tidak ada penghuni',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF718096),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _filteredTenants.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: TenantCard(
+                          tenant: _filteredTenants[index],
+                          onTap: () => _showTenantDetail(_filteredTenants[index]),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

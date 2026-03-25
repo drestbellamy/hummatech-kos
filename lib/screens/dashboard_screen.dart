@@ -11,12 +11,11 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const DashboardHeader(),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const DashboardHeader(),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -131,7 +130,6 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }
