@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'kost_screen.dart';
 import 'penghuni_screen.dart';
-import 'profile_screen.dart';
+import 'info_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
     const DashboardScreen(),
     const KostScreen(),
     const PenghuniScreen(),
-    const ProfileScreen(),
+    const InfoScreen(),
   ];
 
   void _onNavigationTap(int index) {
@@ -51,8 +51,8 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Penghuni',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
+            icon: Icon(Icons.info),
+            label: 'Info',
           ),
         ],
       ),
